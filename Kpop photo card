@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rage Click Button</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #111;
+    color: white;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .container {
+    margin-top: 80px;
+  }
+
+  h1 {
+    margin-bottom: 20px;
+  }
+
+  #counter {
+    font-size: 40px;
+    margin-bottom: 30px;
+  }
+
+  button {
+    background: red;
+    color: white;
+    border: none;
+    padding: 25px 50px;
+    font-size: 24px;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 6px #8b0000;
+    transition: all 0.1s ease;
+    margin-top: 200px;
+  }
+
+  button:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px #8b0000;
+  }
+
+  .clicked {
+    animation: bounce 0.2s;
+  }
+
+  @keyframes bounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+
+  /* FULLSCREEN GIF */
+  #overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: black;
+    z-index: 999;
+  }
+
+  #overlay img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #countdown {
+    position: fixed;
+    top: 20px;
+    width: 100%;
+    font-size: 60px;
+    font-weight: bold;
+    color: yellow;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="countdown"></div>
+
+<div class="container">
+  <h1 id="text">Click this 5 times to view a Kpop group photo cards</h1>
+  <div id="counter">0</div>
+  <button id="btn">CLICK ME</button>
+</div>
+
+<div id="overlay">
+  <img id="gif" src="">
+</div>
+
+<audio id="clickSound">
+  <source src="https://www.soundjay.com/buttons/sounds/button-16.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+let clicks = 0;
+let target = 5;
+let locked = false;
+
+const btn = document.getElementById("btn");
+const text = document.getElementById("text");
+const counter = document.getElementById("counter");
+const sound = document.getElementById("clickSound");
+const overlay = document.getElementById("overlay");
+const gif = document.getElementById("gif");
+const countdownDisplay = document.getElementById("countdown");
+
+// 2 different troll gifs 
+const gifs = [
+  "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif", // laughing cat
+  "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" // evil laugh
+];
+
+function nextTarget(current) {
+  return current + Math.floor(Math.random() * 50 + 20);
+}
+
+btn.addEventListener("click", () => {
+  if (locked) return;
+
+  clicks++;
+  counter.textContent = clicks;
+
+  sound.currentTime = 0;
+  sound.play();
+
+  btn.classList.remove("clicked");
+  void btn.offsetWidth;
+  btn.classList.add("clicked");
+
+  if (clicks >= target) {
+    locked = true;
+
+    // random: 5 or 10 seconds
+    let countdown = Math.random() < 0.5 ? 5 : 10;
+    let chosenGif = countdown === 5 ? gifs[0] : gifs[1];
+
+    text.textContent = "UNLOCKING...";
+    
+    let interval = setInterval(() => {
+      countdownDisplay.textContent = countdown;
+      countdown--;
+
+      if (countdown < 0) {
+        clearInterval(interval);
+        countdownDisplay.textContent = "";
+
+        // show fullscreen gif
+        gif.src = chosenGif;
+        overlay.style.display = "flex";
+
+        setTimeout(() => {
+          overlay.style.display = "none";
+
+          // DO NOT RESET CLICKS 
+          target = nextTarget(target);
+
+          text.textContent = `Click this ${target} times to view a Kpop group photo cards `;
+
+          locked = false;
+        }, 2000);
+      }
+    }, 1000);
+  }
+});
+</script>
+
+</body>
+</html>
